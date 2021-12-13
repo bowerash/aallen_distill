@@ -4,9 +4,12 @@ description: |
   An indepth look at the gender makeup of film directors over the last century
 author:
   - name: Ashley Allen 
-    url: https://anallen.com/films
 date: "`r Sys.Date()`"
-output: distill::distill_article
+output: 
+  distill::distill_article:
+    code_folding: true
+    toc: true
+    highlight: "default"
 ---
 
 
@@ -22,7 +25,7 @@ Using the `rvest` package withing R, I created an intricate for loop that would 
 After the data frame was created, I wrote it to a csv file and exported to Excel for review and cleaning.
 
 
-```
+```{r eval=FALSE, include=TRUE}
 library(rvest) 
 
 movies = data.frame()
@@ -80,7 +83,7 @@ To do a multi-page web scrape I would have leave the IMDB list URL and travel to
 
 Ultimately, I created a function that, when called within the for loop, would travel to the Cast & Crew credits on IMDB and would scrape each actor, actress, and crew member associated with the movie and would create a list of all cast and crew along with the movie's title in the list. I would later use Excel's text-to-column feature to break this list into individual observations. Overall, I scraped nearly 68,000 individuals using this method.
 
-```
+```{r eval=FALSE, include=TRUE}
 get_cast = function(movie_link2) {
   movie_page = read_html(movie_link2)
   movie_name = movie_page %>% html_nodes(".parent a") %>%  html_text() 
@@ -103,7 +106,7 @@ It was during this step that I also calculated for adjusted gross box office ear
 
 At this point I considered selecting a new data set, however, time limitations prevented me from doing so. As you continue, please note my reservations regarding this data's accuracy.
 
-```
+```{r eval=FALSE, include=TRUE}
 #Converts dataframes to tribbles
 as_tibble(movies)
 as_tibble(cast)
@@ -130,7 +133,7 @@ One major hurdle in the cleaning step was addressing the issue of names for dire
 
 While this package was indeed helpful, it failed to recognize many simple names that should have been easy to identify. After completing the gender determination using the genderdata package I have over 15k unknowns. To complement this package I used Google Sheets to call the [Gender API](https://gender-api.com/en/excel) and imported the data I returned. Using these two methods together I was able to assign a gender to most all individuals in the data set.
 
-```
+```{r eval=FALSE, include=TRUE}
 #Creates an empty vector
 director_gender <- c()
 
