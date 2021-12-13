@@ -7,4 +7,4 @@ site: distill::distill_website
 
 ### [Gender Inclusivity in the Film Industry](Film_Project/MovieAnalysis2.html)
 Date: 12/13/2021
-![](Film_Blog_img.PNG)]
+![](Film_Blog_img.PNG)
