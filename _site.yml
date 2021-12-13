@@ -11,7 +11,7 @@ navbar:
       href: "https://github.com/bowerash"
     - text: "Home"
       href: index.html
-    - text: "Film Project"
-      href: Film_Project\MovieAnalysis2.html
+    - text: "Projects"
+      href: about.html
 output: distill::distill_article
 theme: "theme.css"

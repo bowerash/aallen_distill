@@ -1,0 +1,92 @@
+```
+#Libraries Used
+library(dplyr) 
+library(gender) 
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(purrr)
+
+#Reads data csv files and creates a dataframe from the dataset
+movies <- read.csv("Movie_Data.csv", header = TRUE, sep = ",")
+cast <- read.csv("Movie_Cast.csv", header = TRUE, sep = ",")
+genre <- read.csv("Movie_Genre.csv", header = TRUE, sep = ",")
+
+#Removed unwanted columns
+movies = subset(movies, select = -c(X,X.1,X.2,X.3,X.4,X.5) )
+genre = subset(genre, select = c(Movie, Year, Genre) )
+cast = subset(cast, select = c(Title, Cast.First, Cast.Last, Year))
+
+#Converts dataframes to tribbles
+as_tibble(movies)
+as_tibble(cast)
+as_tibble(genre)
+
+#Cleaned up the  column to remove extra spaces
+string <- genre$Genre
+str_squish(string)
+
+string <- cast$Cast.First 
+str_squish(string)
+
+string <- cast$Cast.Title
+str_squish(string)
+
+#Assigns column to variable 
+cast_first <- cast$Cast.First
+director_first <- movies$Director.First
+movie_year <- movies$Year
+cast_year <- cast$Year
+
+#Creates an empty vector
+director_gender <- c()
+
+for (i in 1:(length(director_first)-1)){
+  
+  director_gender <- gender(director_first[i], years = movie_year[i], method = "ssa") %>% .$gender
+ 
+  if(length(gender_prob) == 0) {
+    director_gender <- "Unknown" %>% append(director_gender,.)
+  } else {
+    director_gender <- append(director_gender,gender_prob)
+  }
+  
+}
+
+#Creates an empty vector
+cast_gender <- c()
+
+gender_test <- function(name,year){
+  gender(name, years = year, method = "ssa") %>% .$gender
+}
+
+my_possibly_test <- function(name,year){
+  possibly(
+    gender_test(name,year),
+    otherwise = "NA"
+  )
+}
+
+#This portion here took a lot of work to get through. It involved a lot of testing 
+for (i in 1:(length(cast_first)-1)){
+  
+  test_name = cast_name[i]
+  test_year = cast_year[i]
+  
+  gender_prob <- my_possibly_test(test_name,test_year)
+    
+  if(length(gender_prob) == 0) {
+    cast_gender <- "Unknown" %>% append(cast_gender,.)
+  } else {
+    cast_gender <- append(cast_gender,gender_prob)
+  }
+  
+  print(i)
+  
+}
+
+View(cast_gender)
+
+```
+
+

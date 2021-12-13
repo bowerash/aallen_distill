@@ -1,0 +1,10 @@
+---
+title: "Projects"
+description: |
+  Here I have gathered a collection of my projects over the years for your review. See how I have grown over time and how I continue to apply the skills I have learned in my everyday work! 
+site: distill::distill_website
+---
+
+### [Gender Inclusivity in the Film Industry](Film_Project/MovieAnalysis2.html)
+Date: 12/13/2021
+![](Film_Blog_img.PNG)]

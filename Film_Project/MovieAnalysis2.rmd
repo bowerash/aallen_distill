@@ -10,8 +10,8 @@ output:
     code_folding: true
     toc: true
     highlight: "default"
+    self_contained: false
 ---
-
 
 While reading a blog post shared by [Caroline Barret](https://www.r-bloggers.com/2018/07/gender-diversity-in-the-film-industry/) on July 25, 2018 on [R Bloggers](https://www.r-bloggers.com/) I was inspired to imitate her project and address the concern of women directors in the film industry. Like Barret, I wanted to test my R skills by creating my own dataset that would be primarily concerned with how the number of women directed films have increased throughout the years and how those movies performed in comparison to films directed by men. Additionally, I will use simple linear regression to project the likely earnings of a released in the next five years. For the purpose of this project, performance is evaluated by gross box office earnings (adjusted for inflation) and a film's Meta Score. A Meta Score is assigned by [Metacritic](https://www.metacritic.com/about-metascores) after it has received a minimum of fifteen review publications. A score of 81 or higher is determined to be a must-see. 
 
