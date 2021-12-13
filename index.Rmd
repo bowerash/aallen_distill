@@ -1,0 +1,26 @@
+---
+title: "Welcome!"
+description: |
+  Here I have gathered a collection of my projects over the years for your review. See how I have grown over time and how I continue to apply the skills I have learned in my everyday work! 
+site: distill::distill_website
+---
+![](home_pic.jpg)
+
+### About Me:
+
+I am currently working as a reporting data analyst for Kellogg's, specializing in Invoice to Cash and deductions. Previously, I worked as a Marketing Database Analyst for Gun Lake Casino. 
+
+I am the mom to two adorable border collies who take up a great deal of my time. 
+
+### Education: 
+
+I graduated from Grand Valley State University in 2019 with my bachelor's in Business Management. Currently, I am working on my masters in Data Science & Analytics from the same university. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
+
+```
+

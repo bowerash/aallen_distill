@@ -1,0 +1,68 @@
+```
+# Author: Ashley Bower
+# Course: STA 518
+# Description: This code will pull code from the IMBD URL assigned to the link variable. Data pulled includes movie name, release year, rating, director, gross profit, meta score, genre, and cast. 
+# the code will bind this information into a dataframe which will be written to the file movies.csv. 
+
+library(rvest) 
+library(dplyr)
+library(stringr)
+library(vtable)
+
+
+get_cast = function(movie_link2) {
+  movie_page = read_html(movie_link2)
+  movie_name = movie_page %>% html_nodes(".parent a") %>%  html_text() 
+  movie_cast = movie_page %>% html_nodes(".loadlate , .primary_photo+ td a") %>%  html_text() %>%  paste(movie_name, "-", .) %>% paste(collapse = "|")
+  movie_cast <- movie_cast[!movie_cast %in% c("" )]
+  gsub('[\t\n]', '', movie_cast)
+  
+  return(movie_cast)
+}
+
+movies = data.frame()
+
+
+for (page_result in seq(from = 1, to = 10)) {
+
+link = paste("https://www.imdb.com/list/ls006266261/?st_dt=&mode=detail&page=", page_result, "&ref_=ttls_vm_dtl&sort=list_order,asc", sep ="")
+  
+page = read_html(link)
+
+name <- page %>% rvest::html_nodes(".lister-item-header a") %>% rvest::html_text()
+name <- name[!name %in% c(" Screen Two")]
+
+movie_link = html_node(html_nodes(page, '.lister-item-content'),".lister-item-header a") %>%  html_attr("href") %>% paste("https://www.imdb.com", .,  sep="")
+movie_link2 <- file.path(dirname(movie_link), "fullcredits", str_replace(basename(movie_link), "ttls_li_tt", "tt_ql_cl"))
+
+year <-html_node(html_nodes(page, '.lister-item-content'),".text-muted.unbold") %>% html_text()
+year <- year[!year %in% c("IMDb user rating (average)","Number of votes","Release year or range")]
+
+rating <-html_node(html_nodes(page, '.lister-item-content'),".certificate") %>% html_text()
+
+director <- html_node(html_nodes(page, '.lister-item-content'),".text-small a:nth-child(1)") %>% html_text()
+#Removes unwanted variables from the director vector
+director <- director[!director %in% c("gibboanx" )]
+
+gross <- html_node(html_nodes(page, '.lister-item-content'),".ghost~ .text-muted+ span") %>% html_text()
+#Removes unwanted variables from the gross profit vector
+gross <- gross[!gross %in% c("|"  )]
+
+meta <- html_node(html_nodes(page, '.lister-item-content'), '.ratings-metascore span') %>% html_text()
+
+genre <- html_node(html_nodes(page, '.lister-item-content'),".genre") %>% html_text() 
+
+#Calls function to loop through the full credits URL 
+cast = sapply(movie_link2, FUN = get_cast, USE.NAMES = FALSE)
+
+#Binds variables into a dataframe
+movies <- rbind(movies, data.frame(name, year, rating, director, gross, meta, genre, cast, stringsasfactors = FALSE))
+
+#Tracks the progress of the for loop
+print(paste("Page:", page_result))  
+}
+
+#Writes dataframe movies to a csv file
+write.csv(movies, "movies.csv")
+
+```

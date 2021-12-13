@@ -1,0 +1,185 @@
+```
+#EDA
+
+library(tidyverse) 
+library(vtable)
+
+movies <- read.csv("movie_data_final.csv", header = TRUE, sep = ",")
+
+as_tibble(movies)
+
+movies$CC_Female <- as.numeric(as.character(movies$CC_Female))
+movies$Gross_Adjusted <- as.numeric(as.character(movies$Gross_Adjusted))
+
+movies$Gross_Adjusted <- movies$Gross_Adjusted / 1000000
+movies$Gross <- movies$Gross / 1000000
+
+#remove Gone with the Wind as this is an outlier in the dataset
+movies <- subset(movies, movies$X.Title != "Gone with the Wind") 
+movies <- subset(movies, movies$Gross_Adjusted > 0)
+
+female_led <- subset(movies, movies$Director.Gender == "female")
+male_led <- subset(movies, movies$Director.Gender == "male")
+
+st(movies,title='Summary Statistics (Entire Data Set)')
+st(female_led,title='Summary Statistics (Female Directed Files)')
+st(male_led,title='Summary Statistics (Male Directed Files)')
+
+movies_group <- movies %>% group_by(Year)
+summarise(movies_group)
+
+##########################################################
+
+
+movies %>% ggplot(aes(Year, Meta, color = Director.Gender)) +
+  geom_point() +
+  facet_wrap(~Director.Gender) +
+  labs(title = "Meta Score", x = "Year Released", y = "Meta Score") + 
+  theme_bw()
+
+movies %>%  ggplot(aes(Year, Gross_Adjusted, color = Director.Gender)) +
+              geom_point(size = 2, alpha = 0.5) +
+              geom_smooth(method = lm, se = F) +
+              facet_wrap(~Director.Gender) +
+              labs(title = "Gross Box Office", x = "Year Released", y = "Adjusted Box Office (Millions)") +   
+              theme_bw()
+
+genre_count %>% ggplot(aes(Genre,female_count)) +
+  geom_bar(stat='identity') +
+  labs(title = "Movie Genres by Female Directors", x = "Genre", y = "Count") + 
+  theme_bw()
+
+genre_count %>% ggplot(aes(Genre,male_count)) +
+  geom_bar(stat='identity') +
+  labs(title = "Movie Genres by Male Directors", x = "Genre", y = "Count") + 
+  theme_bw()
+
+female_led %>% ggplot(aes(Gross_Adjusted)) +
+  geom_boxplot() +
+  labs(title = "Female Led Gross Box Office Boxplot", x = "Adjust Gross Box Office") + 
+  theme_bw()
+
+male_led %>% ggplot(aes(Gross_Adjusted)) +
+  geom_boxplot() +
+  labs(title = "Male Led Gross Box Office Boxplot", x = "Adjust Gross Box Office") + 
+  theme_bw()
+
+
+movies %>% ggplot(aes(Gross_Adjusted)) +
+  geom_boxplot() +
+  labs(title = "Gross Box Office Boxplot", x = "Adjust Gross Box Office") + 
+  theme_bw()
+
+
+#Creates a Female Count Set
+
+female_genre1 <- count(female_led,Genre_1)
+female_genre2 <- count(female_led,Genre_2)
+female_genre3 <- count(female_led,Genre_3)
+
+female_genre1 <- female_genre1 %>%  rename(Genre = Genre_1)
+female_genre2 <- female_genre2 %>%  rename(Genre = Genre_2)
+female_genre3 <- female_genre3 %>%  rename(Genre = Genre_3)
+
+
+genre_count <- full_join(
+                female_genre1,
+                female_genre2,
+                by = "Genre"
+)
+
+genre_count <- full_join(
+  female_genre3,
+  genre_count,
+  by = "Genre"
+)
+
+genre_count$Genre[1] = "Action"
+
+genre_count[is.na(genre_count)] <- 0
+genre_count$n = genre_count$n.x + genre_count$n + genre_count$n.y
+genre_count = subset(genre_count, select = c(Genre, n))
+
+
+#Creates a Male Count Set
+
+male_genre1 <- count(male_led,Genre_1)
+male_genre2 <- count(male_led,Genre_2)
+male_genre3 <- count(male_led,Genre_3)
+
+male_genre1 <- male_genre1 %>%  rename(Genre = Genre_1)
+male_genre2 <- male_genre2 %>%  rename(Genre = Genre_2)
+male_genre3 <- male_genre3 %>%  rename(Genre = Genre_3)
+
+
+genre_count_male <- full_join(
+  male_genre1,
+  male_genre2,
+  by = "Genre"
+)
+
+genre_count_male <- full_join(
+  male_genre3,
+  genre_count_male,
+  by = "Genre"
+)
+
+genre_count_male$Genre[1] = "Action"
+
+genre_count_male[is.na(genre_count_male)] <- 0
+genre_count_male$n = genre_count_male$n.x + genre_count_male$n + genre_count_male$n.y
+genre_count_male = subset(genre_count_male, select = c(Genre, n))
+genre_count_male = subset(genre_count_male, Genre != "#N/A")
+
+genre_count_male <- genre_count_male  %>%  rename(male_count = n)
+genre_count <- genre_count %>%  rename(female_count = n)
+
+genre_count <- left_join(
+  x = genre_count_male,
+  y = genre_count,
+  by = "Genre"
+)
+
+genre_count[is.na(genre_count)] <- 0
+
+genre_count <- genre_count[-c(2), ] 
+
+genre_count$female_count[1] = genre_count$female_count[1] + genre_count$female_count[2 ] 
+
+
+###### Rating Count
+
+female_rating <- count(female_led,Rating)
+female_rating <- female_rating %>%  rename(count = n)
+
+male_rating <- count(male_led,Rating)
+male_rating <- male_rating %>%  rename(count = n)
+
+male_genre3 <- male_genre3 %>%  rename(Genre = Genre_3)
+
+
+female_rating %>% ggplot(aes(Rating, count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Movie Ratings by Female Directors", x = "Rating", y = "Count") + 
+  theme_bw()
+
+male_rating %>% ggplot(aes(Rating, count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Movie Ratings by Male Directors", x = "Rating", y = "Count") + 
+  theme_bw()
+
+##Liner regression on female led movies to predict what a female director can expect to earn in 5 year from now
+movie.regression <- lm(formula = female_led$Gross_Adjusted ~ female_led$Year, date = female_led)
+
+summary(movie.regression)
+
+male.regression <- lm(formula = male_led$Gross_Adjusted ~ male_led$Year, date = male_led)
+
+summary(male.regression)
+
+movie.regression <- lm(formula = movies$Gross_Adjusted ~ movies$Year, date = movies)
+
+summary(movie.regression)
+
+```
+              
