@@ -14,3 +14,4 @@ navbar:
     - text: "Film Project"
       href: Film_Project\MovieAnalysis2.html
 output: distill::distill_article
+theme: "theme.css"

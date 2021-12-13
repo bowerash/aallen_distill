@@ -4,7 +4,6 @@ description: |
   An indepth look at the gender makeup of film directors over the last century
 author:
   - name: Ashley Allen 
-    url: https://anallen.com/films
 date: "`r Sys.Date()`"
 output: distill::distill_article
 ---
